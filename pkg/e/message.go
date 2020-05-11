@@ -5,6 +5,8 @@ var messages = map[int]string{
 	NotFound:      "资源未找到",
 	Success:       "操作成功",
 	InvalidParams: "参数不合法",
+	TokenExpired:  "token已过期",
+	TokenInvalid:  "token验证失败",
 }
 
 func GetMessage(code int) string {

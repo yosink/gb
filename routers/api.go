@@ -2,6 +2,7 @@ package routers
 
 import (
 	"blog/api/controllers"
+	"blog/middlewares"
 
 	"github.com/gin-gonic/gin"
 )
@@ -15,5 +16,9 @@ func LoadApiRoutes(r *gin.Engine) {
 			})
 		})
 		api.GET("/articles", controllers.GetArticles)
+		authed := api.Use(middlewares.JWT())
+		{
+			authed.GET("me", controllers.Me)
+		}
 	}
 }

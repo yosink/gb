@@ -5,4 +5,6 @@ const (
 	NotFound      = 404
 	Success       = 200
 	InvalidParams = 400
+	TokenExpired  = 4001
+	TokenInvalid  = 4002
 )
