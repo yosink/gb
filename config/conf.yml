@@ -1,0 +1,16 @@
+version: 1.0
+appName: blog
+
+database:
+  driver: mysql
+  host: 127.0.0.1:3306
+  user: root
+  password: root
+  db: gb
+
+jwtKey: TAjZcIdDPc52DF7n6bJGCU2YNlGaLnpG
+
+redis:
+  host: 127.0.0.1:6379
+  password: ~
+  select: 0

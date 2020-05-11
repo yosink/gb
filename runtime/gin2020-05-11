@@ -1,0 +1,12 @@
+[GIN-debug] GET    /api/                     --> blog/routers.LoadApiRoutes.func1 (3 handlers)
+[GIN-debug] GET    /wap/index                --> blog/web/routers.LoadWebRoutes.func1 (3 handlers)
+[GIN] 2020/05/11 - 10:57:23 | 200 |      88.441µs |             ::1 | GET      "/wap/index"
+[GIN] 2020/05/11 - 10:57:23 | 404 |         539ns |             ::1 | GET      "/favicon.ico"
+[GIN-debug] GET    /assets/*filepath         --> github.com/gin-gonic/gin.(*RouterGroup).createStaticHandler.func1 (3 handlers)
+[GIN-debug] HEAD   /assets/*filepath         --> github.com/gin-gonic/gin.(*RouterGroup).createStaticHandler.func1 (3 handlers)
+[GIN-debug] GET    /api/                     --> blog/routers.LoadApiRoutes.func1 (3 handlers)
+[GIN-debug] GET    /api/articles             --> blog/api/controllers.GetArticles (3 handlers)
+[GIN-debug] GET    /wap/index                --> blog/routers.LoadWebRoutes.func1 (3 handlers)
+[GIN-debug] redirecting request 301: /api/ --> /api/
+[GIN] 2020/05/11 - 11:21:03 | 200 |      58.768µs |             ::1 | GET      "/api/"
+[GIN] 2020/05/11 - 11:21:14 | 200 |   43.362656ms |             ::1 | GET      "/api/articles"
