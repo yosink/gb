@@ -59,7 +59,7 @@ func setPrefix(level Level) {
 	_, f, line, ok := runtime.Caller(2)
 
 	if ok {
-		logPrefix = fmt.Sprintf("[%s][%s:%s]", LevelFlags[level], filepath.Base(f), line)
+		logPrefix = fmt.Sprintf("[%s][%s:%d]", LevelFlags[level], filepath.Base(f), line)
 	} else {
 		logPrefix = fmt.Sprintf("[%s]", LevelFlags[level])
 	}

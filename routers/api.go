@@ -16,6 +16,7 @@ func LoadApiRoutes(r *gin.Engine) {
 			})
 		})
 		api.GET("/articles", controllers.GetArticles)
+		api.GET("/article/:id", controllers.GetArticle)
 		authed := api.Use(middlewares.JWT())
 		{
 			authed.GET("me", controllers.Me)
