@@ -5,7 +5,7 @@ import (
 )
 
 type CategoryResource struct {
-	ID          int64      `json:"id"`
+	ID          uint       `json:"id"`
 	Name        string     `json:"name"`
 	Description string     `json:"description"`
 	ImageURL    string     `json:"image_url"`

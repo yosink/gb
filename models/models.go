@@ -33,5 +33,7 @@ func NewDB() *gorm.DB {
 	db.DB().SetMaxIdleConns(10)
 	db.DB().SetMaxOpenConns(100)
 
+	// 开启sql日志
+	db.LogMode(true)
 	return db
 }

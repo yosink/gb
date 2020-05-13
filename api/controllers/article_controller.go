@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"blog/comm"
 	blogger "blog/logging"
 	"blog/pkg/app"
 	"blog/pkg/e"
@@ -8,7 +9,7 @@ import (
 	"net/http"
 	"strconv"
 
-	valid "github.com/asaskevich/govalidator"
+	"github.com/asaskevich/govalidator"
 
 	"github.com/jinzhu/gorm"
 
@@ -57,30 +58,56 @@ func GetArticle(c *gin.Context) {
 }
 
 type AddArticleRequest struct {
-	CID             uint   `valid:"int,required"`
-	UserID          uint   `valid:"int,required"`
-	Slug            string `valid:"stringlength(3|20),optional"`
-	Title           string `valid:"required,stringlength(2|100)"`
-	Subtitle        string `valid:"stringlength(2|50),optional"`
-	Content         string `valid:"required"`
-	PageImage       string `valid:"required,url"`
-	MetaDescription string `valid:"optional"`
-	Recommend       uint8  `valid:"range(0|1),required"`
-	Sort            uint   `valid:"range(0|255),optional"`
-	ViewCount       uint   `valid:"int"`
+	CID             int    `form:"cid" json:"cid" valid:",int~cid类型错误,required~缺少cid" binding:"required"`
+	UserID          uint   `form:"user_id" json:"userId" valid:"int~user_id类型错误,required~缺少user_id" binding:"required"`
+	Slug            string `form:"slug" json:"slug" valid:"required,stringlength(3|20),slug_unique" binding:"required"`
+	Title           string `form:"title" json:"title" valid:"required,stringlength(2|100)" binding:"required"`
+	Subtitle        string `form:"subtitle" json:"subtitle" valid:",stringlength(2|50),optional"`
+	Content         string `form:"content" json:"contIent" valid:"required" binding:"required"`
+	PageImage       string `form:"page_image" json:"pageImage" valid:"required,url" binding:"required"`
+	MetaDescription string `form:"meta_description" json:"metaDescription" valid:"optional"`
+	Recommend       uint8  `form:"recommend" json:"recommend" valid:"range(0|1),required" binding:"required"`
+	Sort            int    `form:"sort" json:"sort "valid:"range(0|255),optional"`
+	ViewCount       int    `form:"view_count" json:"viewCount" valid:"int"`
 }
 
 func AddArticle(c *gin.Context) {
 	var (
-		appG = app.Gin{C: c}
-		form AddArticleRequest
-		code = e.Success
+		appG     = app.Gin{C: c}
+		form     AddArticleRequest
+		httpCode = e.Success
+		errCode  int
+		data     interface{}
 	)
-	_ = c.Bind(&form)
-	valid.SetFieldsRequiredByDefault(true)
-	_, err := valid.ValidateStruct(form)
-	if err != nil {
-		code = e.InvalidParams
+	service := services.NewArticleService()
+	govalidator.TagMap["slug_unique"] = func(str string) bool {
+		exists, _ := service.Exists(map[string]interface{}{"slug": str})
+		return !exists
 	}
-	appG.Response(http.StatusOK, code, nil)
+	_, err := comm.BindAndValid(c, &form)
+	if err != nil {
+		appG.ResponseError(e.InvalidParams, e.InvalidParams, err.Error())
+		return
+	}
+	// execute add
+	article := map[string]interface{}{
+		"cid":              form.CID,
+		"user_id":          form.UserID,
+		"slug":             form.Slug,
+		"title":            form.Title,
+		"subtitle":         form.Subtitle,
+		"content":          form.Content,
+		"page_image":       form.PageImage,
+		"meta_description": form.MetaDescription,
+		"recommend":        &form.Recommend,
+		"sort":             form.Sort,
+		"view_count":       form.ViewCount,
+	}
+
+	err = service.AddArticle(article)
+	if err != nil {
+		blogger.Error("article create error:", err)
+		errCode = e.ErrorArticleCreate
+	}
+	appG.Response(httpCode, errCode, data)
 }
