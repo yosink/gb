@@ -58,17 +58,17 @@ func GetArticle(c *gin.Context) {
 }
 
 type AddArticleRequest struct {
-	CID             int    `form:"cid" json:"cid" valid:",int~cid类型错误,required~缺少cid" binding:"required"`
-	UserID          uint   `form:"user_id" json:"userId" valid:"int~user_id类型错误,required~缺少user_id" binding:"required"`
-	Slug            string `form:"slug" json:"slug" valid:"required,stringlength(3|20),slug_unique" binding:"required"`
-	Title           string `form:"title" json:"title" valid:"required,stringlength(2|100)" binding:"required"`
-	Subtitle        string `form:"subtitle" json:"subtitle" valid:",stringlength(2|50),optional"`
-	Content         string `form:"content" json:"contIent" valid:"required" binding:"required"`
-	PageImage       string `form:"page_image" json:"pageImage" valid:"required,url" binding:"required"`
-	MetaDescription string `form:"meta_description" json:"metaDescription" valid:"optional"`
-	Recommend       uint8  `form:"recommend" json:"recommend" valid:"range(0|1),required" binding:"required"`
-	Sort            int    `form:"sort" json:"sort "valid:"range(0|255),optional"`
-	ViewCount       int    `form:"view_count" json:"viewCount" valid:"int"`
+	CID             int    `form:"cid" json:"cid" binding:"required" validate:"required,numeric"`
+	UserID          uint   `form:"user_id" json:"userId" binding:"required" validate:"required,numeric"`
+	Slug            string `form:"slug" json:"slug" binding:"required" validate:"required,max=50,min=3"`
+	Title           string `form:"title" json:"title" binding:"required" validate:"required,max=200,min=3"`
+	Subtitle        string `form:"subtitle" json:"subtitle" validate:"max=50,omitempty"`
+	Content         string `form:"content" json:"contIent" binding:"required" validate:"required"`
+	PageImage       string `form:"page_image" json:"pageImage"  binding:"required" validate:"required,url"`
+	MetaDescription string `form:"meta_description" json:"metaDescription" validate:"max=200,omitempty"`
+	Recommend       uint8  `form:"recommend" json:"recommend" binding:"required" validate:"required"`
+	Sort            int    `form:"sort" json:"sort "valid:"numeric,omitempty"`
+	ViewCount       int    `form:"view_count" json:"viewCount" valid:"numeric"`
 }
 
 func AddArticle(c *gin.Context) {
@@ -84,7 +84,7 @@ func AddArticle(c *gin.Context) {
 		exists, _ := service.Exists(map[string]interface{}{"slug": str})
 		return !exists
 	}
-	_, err := comm.BindAndValid(c, &form)
+	_, err := comm.ValidateBind(c, &form)
 	if err != nil {
 		appG.ResponseError(e.InvalidParams, e.InvalidParams, err.Error())
 		return
