@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"blog/models"
+	"blog/pkg/utils"
 
 	"github.com/jinzhu/gorm"
 )
@@ -9,6 +10,7 @@ import (
 type IArticleManager interface {
 	Gets() ([]*models.Article, error)
 	GetsByID(int) (*models.Article, error)
+	GetsList(int, int, map[string]interface{}) ([]*models.Article, error)
 	Add(map[string]interface{}) error
 	Exists(map[string]interface{}) (bool, error)
 }
@@ -39,6 +41,12 @@ func (m *ArticleManager) GetsByID(id int) (*models.Article, error) {
 
 func (m *ArticleManager) Gets() (result []*models.Article, err error) {
 	err = m.DB.Find(&result).Error
+	return
+}
+
+//GetsList
+func (m *ArticleManager) GetsList(page int, perPage int, where map[string]interface{}) (result []*models.Article, err error) {
+	err = m.DB.Where(where).Offset(utils.GetPageOffset(page, perPage)).Limit(perPage).Find(&result).Error
 	return
 }
 

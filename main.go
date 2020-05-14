@@ -3,6 +3,7 @@ package main
 import (
 	"blog/config"
 	"blog/logging"
+	"blog/pkg/gredis"
 	"blog/routers"
 	"context"
 	"log"
@@ -16,6 +17,7 @@ import (
 func main() {
 	config.Setup()
 	logging.Setup()
+	_ = gredis.Setup()
 	r := routers.Setup()
 
 	srv := &http.Server{

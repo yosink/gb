@@ -9,8 +9,6 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/asaskevich/govalidator"
-
 	"github.com/jinzhu/gorm"
 
 	"github.com/gin-gonic/gin"
@@ -58,32 +56,28 @@ func GetArticle(c *gin.Context) {
 }
 
 type AddArticleRequest struct {
-	CID             int    `form:"cid" json:"cid" binding:"required" validate:"required,numeric"`
-	UserID          uint   `form:"user_id" json:"userId" binding:"required" validate:"required,numeric"`
-	Slug            string `form:"slug" json:"slug" binding:"required" validate:"required,max=50,min=3"`
-	Title           string `form:"title" json:"title" binding:"required" validate:"required,max=200,min=3"`
-	Subtitle        string `form:"subtitle" json:"subtitle" validate:"max=50,omitempty"`
-	Content         string `form:"content" json:"contIent" binding:"required" validate:"required"`
-	PageImage       string `form:"page_image" json:"pageImage"  binding:"required" validate:"required,url"`
-	MetaDescription string `form:"meta_description" json:"metaDescription" validate:"max=200,omitempty"`
-	Recommend       uint8  `form:"recommend" json:"recommend" binding:"required" validate:"required"`
-	Sort            int    `form:"sort" json:"sort "valid:"numeric,omitempty"`
-	ViewCount       int    `form:"view_count" json:"viewCount" valid:"numeric"`
+	CID             uint   `form:"cid" json:"cid" binding:"required,numeric"`
+	UserID          uint   `form:"user_id" json:"userId" binding:"required,numeric"`
+	Slug            string `form:"slug" json:"slug" binding:"required,max=50,min=3"`
+	Title           string `form:"title" json:"title" binding:"required,max=200,min=3"`
+	Subtitle        string `form:"subtitle" json:"subtitle" binding:"max=50,omitempty"`
+	Content         string `form:"content" json:"content" binding:"required"`
+	PageImage       string `form:"page_image" json:"pageImage"  binding:"required,url"`
+	MetaDescription string `form:"meta_description" json:"metaDescription" binding:"max=200,omitempty"`
+	Recommend       uint8  `form:"recommend" json:"recommend" binding:"required"`
+	Sort            int    `form:"sort" json:"sort" binding:"numeric,omitempty"`
+	ViewCount       int    `form:"view_count" json:"viewCount" binding:"numeric"`
 }
 
 func AddArticle(c *gin.Context) {
 	var (
 		appG     = app.Gin{C: c}
 		form     AddArticleRequest
-		httpCode = e.Success
-		errCode  int
+		httpCode = http.StatusOK
+		errCode  = e.Success
 		data     interface{}
 	)
 	service := services.NewArticleService()
-	govalidator.TagMap["slug_unique"] = func(str string) bool {
-		exists, _ := service.Exists(map[string]interface{}{"slug": str})
-		return !exists
-	}
 	_, err := comm.ValidateBind(c, &form)
 	if err != nil {
 		appG.ResponseError(e.InvalidParams, e.InvalidParams, err.Error())
@@ -107,6 +101,7 @@ func AddArticle(c *gin.Context) {
 	err = service.AddArticle(article)
 	if err != nil {
 		blogger.Error("article create error:", err)
+		httpCode = http.StatusInternalServerError
 		errCode = e.ErrorArticleCreate
 	}
 	appG.Response(httpCode, errCode, data)

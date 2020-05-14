@@ -40,10 +40,6 @@ func ValidateBind(c *gin.Context, form interface{}) (bool, error) {
 	err := c.Bind(form)
 	if err != nil {
 		blogger.Error("binding error:", err)
-		return false, errors.New("参数错误")
-	}
-	err = valid.Struct(form)
-	if err != nil {
 		errs := err.(validator.ValidationErrors)
 		return false, fmt.Errorf("%s should be %s", errs[0].Field(), errs[0].Tag())
 	}
